@@ -40,12 +40,12 @@ jobs:
            echo "::remove-matcher owner=sphinx-problem-matcher-loose-no-severity::"
            echo "::remove-matcher owner=sphinx-problem-matcher-loose::"
            echo "::remove-matcher owner=sphinx-problem-matcher::"
-           touch ${{runner.workspace}}/build-docs/source/html/.nojekyll
+           touch ${{runner.workspace}}/build-docs/html/manual/html/.nojekyll
       - name: Deploy
         if: github.event_name == 'push' && github.ref == 'refs/heads/development'
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: ${{runner.workspace}}/build-docs/source/html
+          FOLDER: ${{runner.workspace}}/build-docs/html
           SINGLE_COMMIT: true
