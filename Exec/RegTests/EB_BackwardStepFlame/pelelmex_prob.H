@@ -141,4 +141,32 @@ zero_visc(
   // otherwise this routine could be called for other face diffusivity (Temp,
   // velocity, ...)
 }
+
+struct EBhandle {
+    AMREX_GPU_DEVICE
+    AMREX_FORCE_INLINE
+    void bcnormal_eb(const amrex::Real xEBface[AMREX_SPACEDIM],
+                     amrex::Real s_ext[NVAR],
+                     const amrex::Real /*time*/,
+                     amrex::GeometryData const& /*geomdata*/,
+                     ProbParm const& prob_parm) const
+    {
+        // Isothermal wall
+        s_ext[TEMP] = prob_parm.Twall;
+    }
+
+    AMREX_GPU_DEVICE
+    AMREX_FORCE_INLINE
+    void bctype_eb(const amrex::Real xEBface[AMREX_SPACEDIM],
+                   int & EBflagType,
+                   amrex::GeometryData const& /*geomdata*/,
+                   ProbParm const& /*prob_parm*/) const
+    {
+      if (xEBface[0] > 0.0098) {
+        EBflagType = pelelmex::BCTypeEB::wall_isot;
+      } else {
+        EBflagType = pelelmex::BCTypeEB::wall_adiab;
+      }
+    }
+};
 #endif
