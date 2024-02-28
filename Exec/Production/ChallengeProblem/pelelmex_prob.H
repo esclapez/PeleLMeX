@@ -379,4 +379,6 @@ zero_visc(
     }
   }
 }
+
+struct EBhandle {};
 #endif

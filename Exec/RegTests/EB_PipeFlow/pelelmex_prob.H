@@ -230,4 +230,5 @@ zero_visc(
   // otherwise this routine could be called for other face diffusivity (Temp,
   // velocity, ...)
 }
+struct EBhandle {};
 #endif

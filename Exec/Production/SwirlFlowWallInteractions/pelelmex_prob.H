@@ -581,4 +581,6 @@ zero_visc(
   const int /*nComp*/)
 {
 }
+
+struct EBhandle {};
 #endif
