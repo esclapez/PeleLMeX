@@ -30,4 +30,14 @@
 #define NVAR (RHORT + NUMEFIELD + NUMSOOTVAR + NUM_ODE + 1)
 // TODO: handle NAUX
 
+#ifdef AMREX_USE_EB
+namespace pelelmex {
+  enum BCTypeEB {
+    wall_adiab = 0,
+    wall_isot,
+    inflow
+  };
+}
+#endif
+
 #endif
