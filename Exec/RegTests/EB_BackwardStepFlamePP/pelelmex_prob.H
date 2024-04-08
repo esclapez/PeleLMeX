@@ -162,6 +162,8 @@ struct EBhandle {
     AMREX_GPU_DEVICE
     AMREX_FORCE_INLINE
     void bcnormal_eb(const amrex::Real xEBface[AMREX_SPACEDIM],
+                     const amrex::Real EBfaceNormal[AMREX_SPACEDIM], // Outward normal
+                     const amrex::Real s_in[NVAR],
                      amrex::Real s_ext[NVAR],
                      const amrex::Real /*time*/,
                      amrex::GeometryData const& /*geomdata*/,

@@ -34,8 +34,10 @@ struct hasBCNormalEB {
   private:
     template<typename C>
     static constexpr auto check(T*)
-    -> matchBCNormEB_sign<T, AMREX_GPU_DEVICE void(const amrex::Real *,
-                                                   amrex::Real *,
+    -> matchBCNormEB_sign<T, AMREX_GPU_DEVICE void(const amrex::Real *, // Face center coordinate
+                                                   const amrex::Real *, // Face normal (Outward)
+                                                   const amrex::Real *, // Cell-centered state (in)
+                                                   amrex::Real *,       // Face-centered state (out)
                                                    const amrex::Real,
                                                    amrex::GeometryData const&,
                                                    ProbParm const&)>;
@@ -62,12 +64,14 @@ struct PeleLMFillBCStateEB
     AMREX_GPU_DEVICE
     void operator()(
        int i, int j, int k,
+       amrex::Array4<const amrex::Real> const& state,
        amrex::Array4<amrex::Real> const& ebState,
        const int firstcomp,
        const int numcomp,
        AMREX_D_DECL(amrex::Array4<const amrex::Real> const &ebfc_x,
                     amrex::Array4<const amrex::Real> const &ebfc_y,
                     amrex::Array4<const amrex::Real> const &ebfc_z),
+       amrex::Array4<amrex::Real const> const& ebnorm,
        amrex::GeometryData const& geom,
        const amrex::Real time) const
     {
@@ -87,12 +91,14 @@ struct PeleLMFillBCStateEB <T, true>
     AMREX_GPU_DEVICE
     void operator()(
        int i, int j, int k,
+       amrex::Array4<const amrex::Real> const& state,
        amrex::Array4<amrex::Real> const& ebState,
        const int firstcomp,
        const int numcomp,
        AMREX_D_DECL(amrex::Array4<const amrex::Real> const &ebfc_x,
                     amrex::Array4<const amrex::Real> const &ebfc_y,
                     amrex::Array4<const amrex::Real> const &ebfc_z),
+       amrex::Array4<amrex::Real const> const& ebnorm,
        amrex::GeometryData const& geom,
        const amrex::Real time) const
     {
@@ -105,12 +111,21 @@ struct PeleLMFillBCStateEB <T, true>
         const amrex::Real xface[AMREX_SPACEDIM] = {AMREX_D_DECL(xcell[0] + ebfc_x(i,j,k) * dx[0],
                                                                 xcell[1] + ebfc_y(i,j,k) * dx[1],
                                                                 xcell[2] + ebfc_z(i,j,k) * dx[2])};
+        const amrex::Real bcnorm[AMREX_SPACEDIM] = {AMREX_D_DECL(ebnorm(i,j,k,0),
+                                                                 ebnorm(i,j,k,1),
+                                                                 ebnorm(i,j,k,2))};
 
         //TODO : would be practical to have the current state at the EBface ...
+        //Let's start with the state at the cell-centroid
+        amrex::Real stateIn[NVAR] = {0.0};
+        for (int n = 0; n < numcomp; n++) {
+           stateIn[n] = state(i,j,k,n);
+        }
+
         amrex::Real stateExt[NVAR] = {0.0};
 
         // User-defined fill function
-        ebh.bcnormal_eb(xface, stateExt, time, geom, *lprobparm);
+        ebh.bcnormal_eb(xface, bcnorm, stateIn, stateExt, time, geom, *lprobparm);
 
         // Extract requested entries
         for (int n = 0; n < numcomp; n++) {

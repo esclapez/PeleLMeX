@@ -465,7 +465,7 @@ PeleLM::getEBState(
   r.reserve(finest_level+1);
   for (int lev = 0; lev <= finest_level; ++lev) {
     r.push_back(std::make_unique<MultiFab> (grids[lev], dmap[lev], ncomp, m_nGrowState, MFInfo(), Factory(lev)));
-    getEBState(lev, getTime(lev,a_time), *r[lev], first_comp, ncomp);
+    getEBState(lev, a_time, *r[lev], first_comp, ncomp);
   }
   return r;
 }
@@ -477,7 +477,7 @@ PeleLM::getEBState(
   AMREX_ASSERT(first_comp >= VELX);
   AMREX_ASSERT(first_comp+ncomp <= NVAR);
   std::unique_ptr<MultiFab> r = std::make_unique<MultiFab> (grids[a_lev], dmap[a_lev], ncomp, m_nGrowState, MFInfo(), Factory(a_lev));
-  getEBState(a_lev, getTime(a_lev,a_time), *r, first_comp, ncomp);
+  getEBState(a_lev, a_time, *r, first_comp, ncomp);
 
   return r;
 }
@@ -493,6 +493,8 @@ PeleLM::getEBState(
   const auto geomdata = geom[a_lev].data();
   auto time = getTime(a_lev,a_time);
 
+  auto* ldata_p = getLevelDataPtr(a_lev, a_time);
+
   const auto bx = a_mfi.growntilebox(m_nGrowState);
   FArrayBox r(bx,ncomp,The_Async_Arena());
   auto ebscal_arr = r.array();
@@ -500,10 +502,12 @@ PeleLM::getEBState(
   auto const& flagfab = ebfact.getMultiEBCellFlagFab()[a_mfi];
   if ( flagfab.getType(bx) == FabType::singlevalued ) {
     const PeleLMFillBCStateEB<EBhandle,hasBCNormalEB<const EBhandle>::value> EBfiller{lprobparm,EBhandle{}};
-    auto const& flag    = flagfab.const_array();
+    auto const& flag  = flagfab.const_array();
+    const auto& state = ldata_p->state.const_array(a_mfi);
     AMREX_D_TERM( const auto& ebfc_x = ebfact.getFaceCent()[0]->const_array(a_mfi);,
                   const auto& ebfc_y = ebfact.getFaceCent()[1]->const_array(a_mfi);,
                   const auto& ebfc_z = ebfact.getFaceCent()[2]->const_array(a_mfi););
+    const auto& ebnorm = ebfact.getBndryNormal().const_array(a_mfi);
     amrex::ParallelFor(bx, [=]
     AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
@@ -514,7 +518,7 @@ PeleLM::getEBState(
            ebscal_arr(i,j,k,n) = 0.0;
         }
       } else { // cut-cells
-        EBfiller(i, j, k, ebscal_arr, first_comp, ncomp, AMREX_D_DECL(ebfc_x,ebfc_y,ebfc_z), geomdata, a_time);
+        EBfiller(i, j, k, state, ebscal_arr, first_comp, ncomp, AMREX_D_DECL(ebfc_x,ebfc_y,ebfc_z), ebnorm, geomdata, time);
       }
     });
   } else {
@@ -526,7 +530,7 @@ PeleLM::getEBState(
 
 void
 PeleLM::getEBState(
-  int a_lev, const Real& a_time, MultiFab& a_EBstate, int stateComp, int nComp)
+  int a_lev, const PeleLM::TimeStamp &a_time, MultiFab& a_EBstate, int stateComp, int nComp)
 {
   AMREX_ASSERT(a_EBstate.nComp() >= nComp);
 
@@ -535,6 +539,9 @@ PeleLM::getEBState(
   const auto geomdata = geom[a_lev].data();
   const auto& ebfact = EBFactory(a_lev);
   Array<const MultiCutFab*, AMREX_SPACEDIM> faceCentroid = ebfact.getFaceCent();
+  auto time = getTime(a_lev,a_time);
+
+  auto* ldata_p = getLevelDataPtr(a_lev, a_time);
 
   MFItInfo mfi_info;
   if (Gpu::notInLaunchRegion()) {
@@ -558,9 +565,11 @@ PeleLM::getEBState(
         bx, nComp, i, j, k, n, { ebState(i, j, k, n) = 0.0; });
     } else {
       const PeleLMFillBCStateEB<EBhandle,hasBCNormalEB<const EBhandle>::value> EBfiller{lprobparm,EBhandle{}};
+      const auto& state = ldata_p->state.const_array(mfi);
       AMREX_D_TERM(const auto& ebfc_x = faceCentroid[0]->array(mfi);
                    , const auto& ebfc_y = faceCentroid[1]->array(mfi);
                    , const auto& ebfc_z = faceCentroid[2]->array(mfi););
+      const auto& ebnorm = ebfact.getBndryNormal().const_array(mfi);
       amrex::ParallelFor(
         bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
           // Regular/covered cells -> 0.0
@@ -569,7 +578,7 @@ PeleLM::getEBState(
               ebState(i, j, k, n) = 0.0;
             }
           } else { // cut-cells
-            EBfiller(i, j, k, ebState, stateComp, nComp, AMREX_D_DECL(ebfc_x,ebfc_y,ebfc_z), geomdata, a_time);
+            EBfiller(i, j, k, state, ebState, stateComp, nComp, AMREX_D_DECL(ebfc_x,ebfc_y,ebfc_z), ebnorm, geomdata, time);
           }
         });
     }
