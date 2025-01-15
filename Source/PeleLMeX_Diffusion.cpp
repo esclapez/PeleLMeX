@@ -552,7 +552,7 @@ PeleLM::computeDifferentialDiffusionFluxes(
       a_fluxes, NUM_SPECIES, a_EBfluxes, 0,
       GetVecOfConstPtrs(getTempVect(a_time)), 0, {},
       GetVecOfConstPtrs(getDiffusivityVect(a_time)), NUM_SPECIES,
-      GetVecOfConstPtrs(getEBState(TEMP,1,a_time), GetVecOfConstPtrs(EBdiff), bcRecTemp, 1,
+      GetVecOfConstPtrs(getEBState(TEMP,1,a_time)), GetVecOfConstPtrs(EBdiff), bcRecTemp, 1,
       do_avgDown, {});
   } else
 #endif
