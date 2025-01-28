@@ -115,8 +115,8 @@ struct PeleLMFillBCStateEB <T, true>
                                                                  ebnorm(i,j,k,1),
                                                                  ebnorm(i,j,k,2))};
 
-        //TODO : would be practical to have the current state at the EBface ...
-        //Let's start with the state at the cell-centroid
+        // TODO : would be practical to have the current state at the EBface ...
+        // Let's start with the state at the cell-centroid
         amrex::Real stateIn[NVAR] = {0.0};
         for (int n = 0; n < numcomp; n++) {
            stateIn[n] = state(i,j,k,n);
@@ -227,8 +227,8 @@ struct PeleLMFillBCTypeEB <T, true>
                                                                xcell[1] + ebfc_y(i,j,k) * dx[1],
                                                                xcell[2] + ebfc_z(i,j,k) * dx[2])};
 
-       // User-defined fill type function, default is wall adiab
-       EBFlagType = pelelmex::BCTypeEB::wall_adiab;
+       // User-defined fill type function, default is wall noslip adiab
+       EBFlagType = pelelmex::BCTypeEB::wall_noslip_adiab;
        ebh.bctype_eb(xface, EBFlagType, geom, *lprobparm);
     }
 };

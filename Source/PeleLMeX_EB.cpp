@@ -628,10 +628,10 @@ PeleLM::getEBDiff(
           if (flag(i, j, k).isCovered() || flag(i, j, k).isRegular()) {
             ebdiff(i, j, k) = 0.0;
           } else { // cut-cells
-            int ebflagtype = pelelmex::BCTypeEB::wall_adiab;
+            int ebflagtype = pelelmex::BCTypeEB::wall_noslip_adiab;
             EBTypfiller(i, j, k, ebflagtype, AMREX_D_DECL(ebfc_x,ebfc_y,ebfc_z), geomdata, *lprobparm);
             // TODO: this only works for temperature at this point
-            if (ebflagtype == pelelmex::BCTypeEB::wall_adiab) {
+            if (ebflagtype == pelelmex::BCTypeEB::wall_noslip_adiab) {
               ebdiff(i, j, k) = 0.0;
             } else {
               ebdiff(i, j, k) = diff_cc(i,j,k);
