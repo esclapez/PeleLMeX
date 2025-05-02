@@ -253,16 +253,16 @@ EB structure data in the domain ghost cells.</p>
 </section>
 <section id="problem-specifications">
 <h3>Problem specifications<a class="headerlink" href="#problem-specifications" title="Link to this heading"></a></h3>
-<p id="sec-tuto-bfs-problem">The problem setup is mostly contained in the three C++ source/header files described in <a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a>.
-The user parameters are gathered in the struct defined in  <code class="docutils literal notranslate"><span class="pre">pelelmex_prob_parm.H</span></code>:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>struct ProbParm
+<p id="sec-tuto-bfs-problem">The problem setup is mostly contained in the two C++ source/header files described in <a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a>.
+The user parameters are gathered in the struct defined in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>struct MyProbParm : public ProbParmDefault
 {
-    amrex::Real T_mean = 298.0_rt;
-    amrex::Real P_mean = 101325.0_rt;
-    amrex::Real Y_fuel = 0.0445_rt;
-    amrex::Real Y_o2   = 0.223_rt;
-    amrex::Real T_hot  = 1800.0_rt;
-    amrex::Real Twall  = 300.0_rt;
+    amrex::Real T_mean = 298.0;
+    amrex::Real P_mean = 101325.0;
+    amrex::Real Y_fuel = 0.0445;
+    amrex::Real Y_o2   = 0.223;
+    amrex::Real T_hot  = 1800.0;
+    amrex::Real Twall  = 300.0;
     amrex::Real meanFlowMag = 0.0;
 
 };
@@ -279,24 +279,23 @@ The user parameters are gathered in the struct defined in  <code class="docutils
 </ul>
 <p>The initial solution consists of a premixed methane/air mixture in the upper part of the domain
 and pure hot air in the wake of the step. The default parameters provided above are overwritten
-using AMReX ParmParse in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.cpp</span></code> and the initial/boundary conditions implemented in
-<code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>. Alternatively, the user can write a custom function to enforce an ignition kernel through the <code class="docutils literal notranslate"><span class="pre">patchFlowVariables</span></code> function in the problem-specific <code class="docutils literal notranslate"><span class="pre">PeleLMeX_PatchFlowVariables.cpp</span></code> file.
-It should be kept in mind that the <code class="docutils literal notranslate"><span class="pre">patchFlowVariables</span></code> function can be used if the user wants to patch certain flow variables after reading an existing solution from a plot file ( <code class="docutils literal notranslate"><span class="pre">peleLM.initDataPlt_patch_flow_variables</span></code> should be set to true).</p>
-<p>In addition to these three C++ files, an extra header is needed in the present case compared to
-<a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a> : <code class="docutils literal notranslate"><span class="pre">EBUserDefined.H</span></code>. This file is necessary to specify more complex EB
-geometries (not the case here) and to prescribe EB isothermal wall condition. It contains three functions:</p>
+using AMReX ParmParse in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.cpp</span></code> and the initial/boundary conditions implemented
+in the <cite>MyProblemSpecificFunctions</cite> struct of <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>. Alternatively, the user can write a custom
+function to enforce an ignition kernel through the <code class="docutils literal notranslate"><span class="pre">patchFlowVariables</span></code> function in the
+problem-specific functions struct.
+It should be kept in mind that the <code class="docutils literal notranslate"><span class="pre">patchFlowVariables</span></code> function can be used if the user wants to patch certain
+flow variables after reading an existing solution from a plot file ( <code class="docutils literal notranslate"><span class="pre">peleLM.initDataPlt_patch_flow_variables</span></code> should be set to true).</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>, the <cite>MyProblemSpecificFunctions</cite> struct contains several functions in addition to
+<cite>initdata</cite> and <cite>bcnormal</cite> previously described in the <a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">EBUserDefined()</span></code> : can be used to provide a user-defined geometry. It is left empty in the present case.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">setEBState()</span></code> : takes in the EB face center coordinates and return a vector for the entire state vector. For
-isothermal walls, only the <code class="docutils literal notranslate"><span class="pre">TEMP</span></code> component is required.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setEBState()</span></code> : takes in the EB face center coordinates and return a vector
+for the entire state vector. For isothermal walls, only the <code class="docutils literal notranslate"><span class="pre">TEMP</span></code> component is required.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setEBType()</span></code> : even though <code class="docutils literal notranslate"><span class="pre">peleLM.isothermal_EB=1</span></code> is activated, the user can locally decide to use
 an adiabatic wall on part of the EB. To do so, this function takes in the EB face center coordinates
-and return a <code class="docutils literal notranslate"><span class="pre">Real</span></code> flag that should be set to 1.0 on isothermal areas and 0.0 on adiabatic areas. The
-flag is later used to pre-multiply the thermal diffusivity effectively zeroing the thermal flux where the flag
-is 0.0.</p></li>
+and return a flag that should be set to 1 on isothermal areas and 0 on adiabatic areas.</p></li>
 </ul>
 <p>In the present case, we set the EB temperature to <code class="docutils literal notranslate"><span class="pre">T_wall</span></code> everywhere on the EB in <code class="docutils literal notranslate"><span class="pre">setEBState()</span></code> but
-the EB flag is only set to 1.0 on the vertical EB faces (<span class="math notranslate nohighlight">\(x\)</span> normal) such that the top of the EB box
+the EB flag is only set to 1 on the vertical EB faces (<span class="math notranslate nohighlight">\(x\)</span> normal) such that the top of the EB box
 is adiabatic.</p>
 </section>
 <section id="numerical-parameters">

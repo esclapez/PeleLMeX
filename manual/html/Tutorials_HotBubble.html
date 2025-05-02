@@ -224,14 +224,14 @@ amr.max_grid_size   = 128            # max box size
 </section>
 <section id="problem-specifications">
 <h3>Problem specifications<a class="headerlink" href="#problem-specifications" title="Link to this heading"></a></h3>
-<p id="sec-tuto-hb-problem">The problem setup is mostly contained in the three C++ source/header files described in <a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a>.
-The user parameters are gathered in the struct defined in  <code class="docutils literal notranslate"><span class="pre">pelelmex_prob_parm.H</span></code>:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>struct ProbParm
+<p id="sec-tuto-hb-problem">The problem setup is mostly contained in the two C++ source/header files described in <a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a>.
+The user parameters are gathered in the struct defined in  <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>struct ProbParm : public ProbParmDefault
 {
-    amrex::Real P_mean        = 101325.0_rt;
-    amrex::Real T_mean        = 300.0_rt;
-    amrex::Real T_bubble      = 600.0_rt;
-    amrex::Real bubble_rad    = 0.005_rt;
+    amrex::Real P_mean        = 101325.0;
+    amrex::Real T_mean        = 300.0;
+    amrex::Real T_bubble      = 600.0;
+    amrex::Real bubble_rad    = 0.005;
     amrex::Real bubble_y0     = 0.01;
     int         bubble_is_mix = 0;
     int           is_sym      = 0;
@@ -252,8 +252,8 @@ of a different temperature/mixture intended to be lighter such that the bubble w
 influence of gravity. Note that the user can easily reverse the problem with a heavier bubble.
 The default parameters provided above are overwritten using AMReX ParmParse in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.cpp</span></code>
 and the initial/boundary conditions implemented in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>. Because this case does not feature
-any dirichlet BC on the state variables, the <code class="docutils literal notranslate"><span class="pre">bcnormal</span></code> function in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code> will not be called
-and can thus be left empty (but its definition is still required).</p>
+any dirichlet BC on the state variables, the default <code class="docutils literal notranslate"><span class="pre">bcnormal</span></code> function is not overridden in
+the <cite>MyProblemSpecificFunctions</cite> struct defined in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>.</p>
 <p>The interesting aspect of this case is the inclusion of buoyancy effects in the presence of gravity.
 To trigger gravity the following input key is required:</p>
 <div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>peleLM.gravity = 0.0 -9.81 0.0
