@@ -64,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#pelelmex-derived-variables">PeleLMeX derived variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pelelmex-algorithm">PeleLMeX algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#transport-coefficients-and-les">Transport coefficients and LES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#turbulent-forcing-and-velocity-plotfile">Turbulent Forcing and Velocity Plotfile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#chemistry-integrator">Chemistry integrator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#embedded-geometry">Embedded Geometry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#linear-solvers">Linear solvers</a><ul>
@@ -367,8 +368,8 @@ user derived variables to the input file via <cite>amr.derive_plot_vars</cite>.<
 <span class="n">peleLM</span><span class="o">.</span><span class="n">chi_correction_type</span> <span class="o">=</span> <span class="n">DivuFirstIter</span>  <span class="c1"># [OPT, DEF=DivuEveryIter] When to compute divu for MAC proj divu constraint [DivuEveryIter, DivuFirstIter, NoDivu]</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">print_chi_convergence</span> <span class="o">=</span> <span class="mi">1</span>            <span class="c1"># [OPT, DEF=(peleLM.v &gt; 1)] Boolean flag on whether to print size of chi correction on each SDC iter</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">incompressible</span> <span class="o">=</span> <span class="mi">0</span>              <span class="c1"># [OPT, DEF=0] Enable to run fully incompressible, scalar advance is bypassed</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">m_rho</span> <span class="o">=</span> <span class="mf">1.17</span>                    <span class="c1"># [OPT, DEF=-1] If incompressible, density value [MKS]</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">m_mu</span> <span class="o">=</span> <span class="mf">1.8e-5</span>                   <span class="c1"># [OPT, DEF=-1] If incompressible, kinematic visc. value [MKS]</span>
+<span class="n">peleLM</span><span class="o">.</span><span class="n">rho</span> <span class="o">=</span> <span class="mf">1.17</span>                      <span class="c1"># [OPT, DEF=-1] If incompressible, density value [MKS]</span>
+<span class="n">peleLM</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="mf">1.8e-5</span>                     <span class="c1"># [OPT, DEF=-1] If incompressible, dynamic visc. value [MKS]</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">gravity</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="mf">0.0</span> <span class="o">-</span><span class="mf">9.81</span>         <span class="c1"># [OPT, DEF=Vec{0.0}] Gravity vector [MKS]</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">gradP0</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="mf">0.0</span> <span class="mf">10.0</span>           <span class="c1"># [OPT, DEF=Vec{0.0}] Average background pressure gradient [Pa/m]</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">do_periodic_channel</span> <span class="o">=</span> <span class="mi">0</span>         <span class="c1"># [OPT, DEF= 0] Add an automatic pressure gradient to maintain initial condition mass flow rate in periodic channel</span>
@@ -395,6 +396,7 @@ user derived variables to the input file via <cite>amr.derive_plot_vars</cite>.<
 <span class="n">peleLM</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">Schmidt</span> <span class="o">=</span> <span class="mf">0.7</span>                 <span class="c1"># [OPT, DEF = -1] Schmidt number for auxiliary variable. If unspecified or negative, assumed to diffuse with unity Lewis number.</span>
 
 <span class="n">peleLM</span><span class="o">.</span><span class="n">user_defined_ext_sources</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># [OPT, DEF=0] Enable user defined source terms. Requires local ProblemSpecificFunctions.cpp.</span>
+<span class="n">peleLM</span><span class="o">.</span><span class="n">add_variance_sources</span> <span class="o">=</span> <span class="mi">1</span>        <span class="c1"># [OPT, DEF=1] (only relevant for Manifold EOS) include production/dissipation for variances if present in model</span>
 </pre></div>
 </div>
 </section>
@@ -422,6 +424,27 @@ user derived variables to the input file via <cite>amr.derive_plot_vars</cite>.<
 which are not fully supported. Currently a correction for all terms except the wbar term
 is applied at isothermal domain boundaries (this is likely sufficient), while no corrections are applied
 at isothermal embedded boundaries (so use caution for isothermal EBs with Soret diffusion active).</p>
+</div>
+</section>
+<section id="turbulent-forcing-and-velocity-plotfile">
+<h2>Turbulent Forcing and Velocity Plotfile<a class="headerlink" href="#turbulent-forcing-and-velocity-plotfile" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#-----------------------Turbulent Forcing-----------------------
+peleLM.do_turbulent_forcing    = 0           # [OPT, DEF=0] Use turbulent forcing (note, all turbforce. options are inherited from PelePhysics).
+turbforce.v                    = 0         # [OPT, DEF=0] Verbosity level for turbulent forcing.
+turbforce.urms                 = 1.0       # [OPT, DEF=1.0] Target urms.
+turbforce.time_offset          = 0.0       # [OPT, DEF=0] Offset of the forcing function.
+turbforce.hack_lz              = 0         # [OPT, DEF=0] Allow periodic reproduction in z.
+turbforce.force_scale_fudge    = 1.0       # [OPT, DEF=1.0] Used for fine scale tuning of the forcing function.
+turbforce.rho_incompressible   = -1.0      # [OPT, DEF=-1.0] Density if running in incompressible mode (otherwise this is not used).
+
+peleLM.velocity_plotfile       = plt?????  # [OPT, DEF=&quot;&quot;] Name of a plotfile that you want to provide velocities to add to the initial conditions (must match base grid and domain size exactly).
+peleLM.velocity_plotfile_scale = 1.0       # [OPT, DEF=1.0] Scaling of the velocities provided from the velocity_plotfile
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For ff_factor, nmodes, forcing_epsilon, spectrum_type and moderate_zero_modes, it is best to leave
+these as defaults unless you are confident on the consiquences.</p>
 </div>
 </section>
 <section id="chemistry-integrator">
@@ -465,8 +488,8 @@ must set:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eb2</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">=</span> <span class="n">UserDefined</span>
 </pre></div>
 </div>
-<p>and then implement the actual geometry definition in a <cite>EBUserDefined.H</cite> file located in the run folder (and add
-to the GNUmakefile using <cite>CEXE_headers += EBUserDefined.H</cite>). An example of such implementation is available in the
+<p>and then implement the actual geometry definition in the <cite>EBUserDefined</cite> member function of the <cite>ProblemSpecificFunctions</cite> struct in
+<code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>. An example of such implementation is available in the
 <code class="docutils literal notranslate"><span class="pre">Exec/Case/ChallengeProblem</span></code> folder. Example of more generic EB problems are also found in the <code class="docutils literal notranslate"><span class="pre">Exec/RegTest/EB_*</span></code>
 folders.</p>
 <p>In addition to the input keys presented above, a set of <cite>PeleLMeX</cite>-specific keys are available in order to control refinement at the EB:</p>
@@ -504,12 +527,26 @@ flag:</p>
 </pre></div>
 </div>
 <p>The user is now responsible for providing the wall temperature <em>on all the EB walls</em>, but adiabtic wall can still be specified.
-Control over the local EB thermal boundary condition is provided through the <cite>setEBState</cite> and <cite>setEBType</cite> functions, also
-defined in the <cite>EBUserDefined.H</cite> already used above to provide a user-defined EB geometry. Example of isothermal EBs are provided
+Control over the local EB thermal boundary condition is provided through the <cite>bcnormal_eb</cite> and <cite>bctype_eb</cite> functions, also
+defined in the <cite>ProblemSpecificFunctions</cite> struct in <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code> already used above to provide a user-defined EB geometry.
+Examples of isothermal EBs are provided
 in <code class="docutils literal notranslate"><span class="pre">Exec/RegTest/EB_BackwardStepFlame</span></code> and <code class="docutils literal notranslate"><span class="pre">Exec/RegTest/EB_FlowPastCylinder</span></code> tests.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Note that when using isothermal EB in combination with LES, the thermal diffusion coefficient employed to compute the EB boundary thermal flux only uses the molecular contribution.</p>
+</div>
+<p>Inflow boundaries on EB surfaces may also be specified through experimental capability by setting the following flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">peleLM</span><span class="o">.</span><span class="n">EBinflow</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Similarly to isothermal boundaries, the user is responsible for specifying the inflow conditions using the <cite>bcnormal_eb</cite> function,
+but this function must not specify all state variables in the region of the inflow. Again, an example is provided in the
+<code class="docutils literal notranslate"><span class="pre">Exec/RegTest/EB_BackwardStepFlame</span></code> test case.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>EB inflow capability is still experimental. Scalar diffusion at these boundaries is not yet supported. This capability and the user interface
+are subject to potential change in the future and bugs/unanticipated behavior are more likely with this capability for now. Potential changes
+may also impact the isothermal EB capability.</p>
 </div>
 <p>Lastly, it is possible to change the default redistribution scheme described in the <a class="reference internal" href="Model.html#ssec-geoeb"><span class="std std-ref">geometry with embedded boundaries section:</span></a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">peleLM</span><span class="o">.</span><span class="n">adv_redist_type</span> <span class="o">=</span> <span class="n">StateRedist</span>  <span class="c1"># [OPT, DEF=StateRedist] Redistribution scheme for advection [StateRedist, FluxRedist, NoRedist]</span>
@@ -696,55 +733,28 @@ state:</p>
 </pre></div>
 </div>
 <p>Analysing the data a-posteriori can become extremely cumbersome when dealing with extreme datasets.
-PeleLMeX offers a set of diagnostics available at runtime and more are under development.
+PeleLMeX offers a set of diagnostics available at runtime (supported through PelePhysics) and more are under development.
 Currently, the list of diagnostic contains:</p>
 <ul class="simple">
-<li><p><cite>DiagFramePlane</cite> : extract a plane aligned in the ‘x’,’y’ or ‘z’ direction across the AMR hierarchy, writing
+<li><p><code class="docutils literal notranslate"><span class="pre">DiagFramePlane</span></code> : extract a plane aligned in the ‘x’,’y’ or ‘z’ direction across the AMR hierarchy, writing
 a 2D plotfile compatible with Amrvis, Paraview or yt. Only available for 3D simulations.</p></li>
-<li><p><cite>DiagPDF</cite> : extract the PDF of a given variable and write it to an ASCII file.</p></li>
-<li><p><cite>DiagConditional</cite> : extract statistics (average and standard deviation, integral or sum) of a
+<li><p><code class="docutils literal notranslate"><span class="pre">DiagPDF</span></code> : extract the PDF of a given variable and write it to an ASCII file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DiagConditional</span></code> : extract statistics (average and standard deviation, integral or sum) of a
 set of variables conditioned on the value of given variable and write it to an ASCII file.</p></li>
 </ul>
 <p>When using <cite>DiagPDF</cite> or <cite>DiagConditional</cite>, it is possible to narrow down the diagnostic to a region of interest
 by specifying a set of filters, defining a range of interest for a variable. Note also the for these two diagnostics,
-fine-covered regions are masked. The following provide examples for each diagnostic:</p>
+fine-covered regions are masked. An arbitrary number of these diagnostics may be specified in a list by setting
+<code class="docutils literal notranslate"><span class="pre">peleLM.diagnostics</span></code> in the input file and then specifying the diagnostic type and relevant inputs for each
+diagnostic listed. See the
+<a class="reference external" href="https://amrex-combustion.github.io/PelePhysics/Utility.html#diagnostics">PelePhysics Diagnostics documentation</a> for full
+details on the options that must be specified for each diagnostic type.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#--------------------------DIAGNOSTICS------------------------</span>
 
 <span class="n">peleLM</span><span class="o">.</span><span class="n">diagnostics</span> <span class="o">=</span> <span class="n">xnormP</span> <span class="n">condT</span> <span class="n">pdfTest</span>
 
 <span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">DiagFramePlane</span>                             <span class="c1"># Diagnostic type</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">xNorm5mm</span>                                   <span class="c1"># Output file prefix</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">normal</span> <span class="o">=</span> <span class="mi">0</span>                                        <span class="c1"># Plane normal (0, 1 or 2 for x, y or z)</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="mf">0.005</span>                                    <span class="c1"># Coordinate in the normal direction</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">int</span>    <span class="o">=</span> <span class="mi">5</span>                                        <span class="c1"># Frequency (as step #) for performing the diagnostic</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">=</span> <span class="n">Linear</span>                            <span class="c1"># [OPT, DEF=Linear] Interpolation type : Linear or Quadratic</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="n">x_velocity</span> <span class="n">mag_vort</span> <span class="n">density</span>         <span class="c1"># List of variables outputted to the 2D pltfile</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">xnormP</span><span class="o">.</span><span class="n">n_files</span> <span class="o">=</span> <span class="mi">2</span>                                       <span class="c1"># [OPT, DEF=&quot;min(256,NProcs)&quot;] Number of files to write per level</span>
-
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">DiagConditional</span>                             <span class="c1"># Diagnostic type</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">condTest</span>                                    <span class="c1"># Output file prefix</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">int</span>  <span class="o">=</span> <span class="mi">5</span>                                           <span class="c1"># Frequency (as step #) for performing the diagnostic</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">xHigh</span> <span class="n">stoich</span>                             <span class="c1"># [OPT, DEF=None] List of filters</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">xHigh</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">x</span>                               <span class="c1"># Filter field</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">xHigh</span><span class="o">.</span><span class="n">value_greater</span> <span class="o">=</span> <span class="mf">0.006</span>                        <span class="c1"># Filter definition : value_greater, value_less, value_inrange</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">stoich</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">mixture_fraction</span>               <span class="c1"># Filter field</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">stoich</span><span class="o">.</span><span class="n">value_inrange</span> <span class="o">=</span> <span class="mf">0.053</span> <span class="mf">0.055</span>                 <span class="c1"># Filter definition : value_greater, value_less, value_inrange</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">conditional_type</span> <span class="o">=</span> <span class="n">Average</span>                         <span class="c1"># Conditional type : Average, Integral or Sum</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">nBins</span> <span class="o">=</span> <span class="mi">50</span>                                         <span class="c1"># Number of bins for the conditioning variable</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">condition_field_name</span> <span class="o">=</span> <span class="n">temp</span>                        <span class="c1"># Conditioning variable name</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">condT</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="n">HeatRelease</span> <span class="n">I_R</span><span class="p">(</span><span class="n">CH4</span><span class="p">)</span> <span class="n">I_R</span><span class="p">(</span><span class="n">H2</span><span class="p">)</span>         <span class="c1"># List of variables to be treated</span>
-
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">DiagPDF</span>                                   <span class="c1"># Diagnostic type</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">PDFTest</span>                                   <span class="c1"># Output file prefix</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">int</span>  <span class="o">=</span> <span class="mi">5</span>                                         <span class="c1"># Frequency (as step #) for performing the diagnostic</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">innerFlame</span>                             <span class="c1"># [OPT, DEF=None] List of filters</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">innerFlame</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">temp</span>                     <span class="c1"># Filter field</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">innerFlame</span><span class="o">.</span><span class="n">value_inrange</span> <span class="o">=</span> <span class="mf">450.0</span> <span class="mf">1500.0</span>          <span class="c1"># Filter definition : value_greater, value_less, value_inrange</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">nBins</span> <span class="o">=</span> <span class="mi">50</span>                                       <span class="c1"># Number of bins for the PDF</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">normalized</span> <span class="o">=</span> <span class="mi">1</span>                                   <span class="c1"># [OPT, DEF=1] PDF is normalized (i.e. integral is unity) ?</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">volume_weighted</span> <span class="o">=</span> <span class="mi">1</span>                              <span class="c1"># [OPT, DEF=1] Computation of the PDF is volume weighted ?</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">range</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="mf">2.0</span>                                  <span class="c1"># [OPT, DEF=data min/max] Specify the range of the PDF</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">pdfTest</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">x_velocity</span>                          <span class="c1"># Variable of interest</span>
+<span class="o">...</span>
 </pre></div>
 </div>
 </section>

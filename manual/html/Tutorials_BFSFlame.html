@@ -76,6 +76,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#checking-the-initial-conditions">Checking the initial conditions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#advance-the-solution-on-coarse-grid">Advance the solution on coarse grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#refine-the-simulation">Refine the simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#partially-premixed-case-with-eb-inflow">Partially premixed case with EB-inflow</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Tutorials_TripleFlame.html">A simple triple flame</a></li>
@@ -188,7 +189,7 @@ Finally a Cartesian coordinate system is used here. An overview of the computati
 <p><span class="caption-number">Fig. 17 </span><span class="caption-text">: Setup of the computational domain for the backward facing step flame case.</span><a class="headerlink" href="#bfs-setupgeom" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>All of the geometrical information can be specified the first two blocks of the input file (<cite>input.2d</cite>):</p>
+<p>All of the geometrical information can be specified the first two blocks of the input file (<cite>eb_bfs.inp</cite>):</p>
 <div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>#---------------------- DOMAIN DEFINITION ------------------------
 geometry.is_periodic = 0 0                  # For each dir, 0: non-perio, 1: periodic
 geometry.coord_sys   = 0                    # 0 =&gt; cart, 1 =&gt; RZ
@@ -288,13 +289,15 @@ flow variables after reading an existing solution from a plot file ( <code class
 <p>In <code class="docutils literal notranslate"><span class="pre">pelelmex_prob.H</span></code>, the <cite>MyProblemSpecificFunctions</cite> struct contains several functions in addition to
 <cite>initdata</cite> and <cite>bcnormal</cite> previously described in the <a class="reference internal" href="Tutorials_FlameSheet.html"><span class="doc">Premixed flame sheet with harmonic perturbations</span></a>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">setEBState()</span></code> : takes in the EB face center coordinates and return a vector
-for the entire state vector. For isothermal walls, only the <code class="docutils literal notranslate"><span class="pre">TEMP</span></code> component is required.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">setEBType()</span></code> : even though <code class="docutils literal notranslate"><span class="pre">peleLM.isothermal_EB=1</span></code> is activated, the user can locally decide to use
+<li><p><code class="docutils literal notranslate"><span class="pre">bcnormal_eb()</span></code> : takes in the EB face center coordinates and return a vector
+for the entire state vector. For isothermal walls, only the <code class="docutils literal notranslate"><span class="pre">TEMP</span></code> component is required. For inflows,
+the whole state must be specified.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bctype_eb()</span></code> : even though <code class="docutils literal notranslate"><span class="pre">peleLM.isothermal_EB=1</span></code> is activated, the user can locally decide to use
 an adiabatic wall on part of the EB. To do so, this function takes in the EB face center coordinates
-and return a flag that should be set to 1 on isothermal areas and 0 on adiabatic areas.</p></li>
+and return a flag that indicates the boundary type. Additionally, it also returns a real valued parameter,
+<cite>EBfaceFrac</cite>, that indicates the fraction of the face that is isothermal or inflow.</p></li>
 </ul>
-<p>In the present case, we set the EB temperature to <code class="docutils literal notranslate"><span class="pre">T_wall</span></code> everywhere on the EB in <code class="docutils literal notranslate"><span class="pre">setEBState()</span></code> but
+<p>In the present case, we set the EB temperature to <code class="docutils literal notranslate"><span class="pre">T_wall</span></code> everywhere on the EB in <code class="docutils literal notranslate"><span class="pre">bcnormal_eb()</span></code> but
 the EB flag is only set to 1 on the vertical EB faces (<span class="math notranslate nohighlight">\(x\)</span> normal) such that the top of the EB box
 is adiabatic.</p>
 </section>
@@ -376,7 +379,7 @@ of <cite>PeleLMeX</cite>. To do so, type in the following command:</p>
 <section id="checking-the-initial-conditions">
 <h2>Checking the initial conditions<a class="headerlink" href="#checking-the-initial-conditions" title="Link to this heading"></a></h2>
 <p>It is always a good practice to check the initial conditions. To do so, run the simulation specifying
-an <code class="docutils literal notranslate"><span class="pre">amr.max_step</span></code> of 0. Open the <code class="docutils literal notranslate"><span class="pre">input.2d</span></code> with your favorite editor and update the following parameters</p>
+an <code class="docutils literal notranslate"><span class="pre">amr.max_step</span></code> of 0. Open the <code class="docutils literal notranslate"><span class="pre">eb_bfs.inp</span></code> with your favorite editor and update the following parameters</p>
 <div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>#---------------------- Time Stepping CONTROL --------------------
 amr.max_step      = 0             # Maximum number of time steps
 </pre></div>
@@ -384,7 +387,7 @@ amr.max_step      = 0             # Maximum number of time steps
 <p>Since we’ve set the maximum number of steps to 0, the solver will exit after
 the initial solution is obtained. Let’s run the simulation with the default problem parameter
 listed in the input file. To do so, use:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>./PeleLMeX2d.gnu.MPI.ex input.2d
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>./PeleLMeX2d.gnu.MPI.ex eb_bfs.inp
 </pre></div>
 </div>
 <p>A variety of information is printed to the screen:</p>
@@ -419,7 +422,7 @@ parameters. To do so, ensure that:</p>
 <p>Additionally, make sure that <code class="docutils literal notranslate"><span class="pre">amr.check_int</span></code> is set to a positive value to trigger writing a
 checkpoint file from which to later restart the simulation. If available, use more than one MPI
 rank to run the simulation and redirect the standard output to a log file using:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex input.2d &gt; logInitCoarse.dat &amp;
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex eb_bfs.inp &gt; logInitCoarse.dat &amp;
 </pre></div>
 </div>
 <p>Using 4 MPI ranks, it takes about 200 seconds to complete.
@@ -465,7 +468,7 @@ amr.restart = chk00250                      # Restart checkpoint file
 </pre></div>
 </div>
 <p>and restart the simulation:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex input.2d &gt; logFail.dat &amp;
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex eb_bfs.inp &gt; logFail.dat &amp;
 </pre></div>
 </div>
 <p>The simulation will proceed, with the step size progressively increasing due to the higher CFL
@@ -510,7 +513,7 @@ amr.ref_ratio       = 2 2 2 2               # refinement ratio
 </pre></div>
 </div>
 <p>Restart the simulation:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex input.2d &gt; log1AMR.dat &amp;
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex eb_bfs.inp &gt; log1AMR.dat &amp;
 </pre></div>
 </div>
 <p>Using 4 MPI ranks, the simulation takes approximately 13 mn, so plenty of time to get
@@ -560,7 +563,7 @@ peleLM.progressVariable.hotState = CO:0.003 CO2:0.122
 </pre></div>
 </div>
 <p>Update the <code class="docutils literal notranslate"><span class="pre">amr.restart</span></code> and <code class="docutils literal notranslate"><span class="pre">amr.max_step</span></code> to <cite>chk00500</cite> and <cite>1000</cite>, respectively and restart the simulation:</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex input.2d &gt; log1AMRcnt.dat &amp;
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>mpirun -n 4 ./PeleLMeX2d.gnu.MPI.ex eb_bfs.inp &gt; log1AMRcnt.dat &amp;
 </pre></div>
 </div>
 <p>Once again, the simulation takes approximately 30 mn to complete. At this point, the flame is fairly well established
@@ -688,6 +691,13 @@ the upstream and downstream region of the flame.</p>
 <p>Note that for this analysis to be relevant, we would need to run the simulation longer to completely
 remove the effect of the initial hot air still trapped in the recirculation zone at this point and largely
 affecting the upstream average data.</p>
+</section>
+<section id="partially-premixed-case-with-eb-inflow">
+<h2>Partially premixed case with EB-inflow<a class="headerlink" href="#partially-premixed-case-with-eb-inflow" title="Link to this heading"></a></h2>
+<p>This case also includes a separate input file designed to demonstrate the experimental EB-inflow
+capability in PeleLMeX. This input file <code class="docutils literal notranslate"><span class="pre">eb_bfs_pp.inp</span></code> corresponds to a partially premixed
+flame, with a fuel jet flowing upward from the horizontal EB surface and mixing with oxidizer
+flowing in through the left domain boundary.</p>
 </section>
 </section>
 
