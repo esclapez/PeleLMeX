@@ -84,6 +84,13 @@ amr.yH.max_level     = 3
 amr.yH.value_greater = 1.0e-6
 amr.yH.field_name    = Y(H)
 
+#-------------------------- Probes CONTROL------------------------
+peleLM.probes = test1 test2
+peleLM.probes.test1 = 0.004 0.008
+peleLM.probes.test2 = 0.004 0.016
+peleLM.probes.variables = temp
+peleLM.probes.int = 2
+
 #---------------------- Debug/HPC CONTROL-------------------------
 #amrex.fpe_trap_invalid = 1
 #amrex.fpe_trap_zero = 1
