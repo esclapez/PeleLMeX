@@ -37,6 +37,7 @@ CEXE_sources += PeleLMeX_Forces.cpp
 CEXE_sources += PeleLMeX_UMac.cpp
 CEXE_sources += PeleLMeX_Reactions.cpp
 CEXE_sources += PeleLMeX_Temporals.cpp
+CEXE_sources += PeleLMeX_Probes.cpp
 CEXE_sources += PeleLMeX_EB.cpp
 CEXE_sources += PeleLMeX_Diagnostics.cpp
 CEXE_sources += PeleLMeX_FlowController.cpp

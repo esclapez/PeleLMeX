@@ -10,8 +10,9 @@ PeleLM::Init()
 {
   BL_PROFILE("PeleLMeX::Init()");
 
-  // Open temporals file
+  // Open temporals and probes file
   openTempFile();
+  openProbesFile();
 
   // Check run parameters
   checkRunParams();
@@ -191,6 +192,7 @@ PeleLM::initData()
     }
     resetCoveredMask();
     updateDiagnostics();
+    updateProbesCellsAndWeights();
 
 #ifdef PELE_USE_SPRAY
     SprayInit();
@@ -343,6 +345,7 @@ PeleLM::initData()
     m_resetCoveredMask = 1;
     resetCoveredMask();
     updateDiagnostics();
+    updateProbesCellsAndWeights();
 
     // Active control
     constexpr int is_restart = 1;

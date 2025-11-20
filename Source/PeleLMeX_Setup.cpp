@@ -185,6 +185,9 @@ PeleLM::Setup()
     initBPatches(Geom(0));
   }
 
+  // Probes setup
+  probesSetup();
+
   // Initialize Level Hierarchy data
   resizeArray();
 

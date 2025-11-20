@@ -25,6 +25,7 @@ PeleLM::~PeleLM()
   }
 
   closeTempFile();
+  closeProbesFile();
   typical_values.clear();
   freeProbParm();
   delete prob_parm;

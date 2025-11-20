@@ -40,6 +40,7 @@ PeleLM::Evolve()
       regridded = true;
 #endif
       updateDiagnostics();
+      updateProbesCellsAndWeights();
     }
 #ifdef PELE_USE_SPRAY
     // Inject and redistribute spray particles
@@ -69,6 +70,11 @@ PeleLM::Evolve()
 
     // Diagnostics
     doDiagnostics();
+
+    // Probes
+    if (doProbesNow()) {
+      writeProbes();
+    }
 
     // Check message
     const bool dump_and_stop = checkMessage("dump_and_stop");
@@ -218,6 +224,12 @@ bool
 PeleLM::doTemporalsNow() const
 {
   return (m_do_temporals != 0) && (m_nstep % m_temp_int == 0);
+}
+
+bool
+PeleLM::doProbesNow() const
+{
+  return (m_have_probes != 0) && (m_nstep % m_probes_int == 0);
 }
 
 bool
