@@ -229,7 +229,7 @@ PeleLM::doTemporalsNow() const
 bool
 PeleLM::doProbesNow() const
 {
-  return (m_have_probes != 0) && (m_nstep % m_probes_int == 0);
+  return (m_nprobes > 0) && (m_nstep % m_probes_int == 0);
 }
 
 bool

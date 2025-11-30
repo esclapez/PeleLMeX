@@ -2167,14 +2167,16 @@ public:
   std::ofstream tmppatchmfrFile;
 
   // Probes
-  int m_have_probes = 0;
+  int m_nprobes = 0;
   int m_probes_int = 5;
-  std::ofstream tmpProbesFile;
+  amrex::Vector<std::ofstream> m_tmpProbesFile;
   amrex::Vector<amrex::Array<amrex::Real, AMREX_SPACEDIM> > m_probes_coord;
-  amrex::Vector<amrex::Array<int, AMREX_SPACEDIM + 1> > m_probes_cell;
+  amrex::Vector<amrex::Array<int, AMREX_SPACEDIM + 2> > m_probes_cell;
   amrex::Vector<amrex::Array<amrex::Real, 2 * AMREX_SPACEDIM + 1> > m_probes_weight;
   amrex::Vector<std::string> m_probes_name;
   amrex::Vector<std::string> m_probes_vars;
+  int m_mynprobes = 0;
+  amrex::Vector<int> m_myprobes;
 
   // Number of ghost cells
 #ifdef AMREX_USE_EB
