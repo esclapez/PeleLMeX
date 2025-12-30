@@ -82,7 +82,9 @@ PeleLM::updateProbesCellsAndWeights()
 
   // Find the cell, level and proc the probe is on
   for (int lev = finest_level; lev >= 0; --lev) {
+
     for (int i = 0; i < m_nprobes; ++i) {
+
       // Probe already located on finer level, skip
       if (m_probes_cell[i][0] >= 0) {
           continue;
@@ -128,7 +130,6 @@ PeleLM::updateProbesCellsAndWeights()
           m_myprobes[m_mynprobes] = i;
           m_mynprobes += 1; 
       }
-
     }
   }
 
@@ -147,13 +148,13 @@ PeleLM::writeProbes()
     // Probe index
     int pidx = m_myprobes[k];
     // Get the data to write
-    amrex::Vector<amrex::Real> pdata(m_probes_vars.size(), 0.0); 
+    amrex::Vector<amrex::Real> pdata(NVAR, 0.0);
 
     // TODO: GPU
     auto* ldata_p = getLevelDataPtr(m_probes_cell[pidx][0], AmrNewTime);
     int ip = m_probes_cell[pidx][2];
     int jp = m_probes_cell[pidx][3];
-    int kp = m_probes_cell[pidx][4] ? AMREX_SPACEDIM == 3 : 0;
+    int kp = (AMREX_SPACEDIM == 3) ? m_probes_cell[pidx][4] : 0;
     auto state_celldata = ldata_p->state.array(m_probes_cell[pidx][1]).cellData(ip,jp,kp);
     for (int i = 0; i < NVAR; ++i) {
         pdata[i] = state_celldata[i];
