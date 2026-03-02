@@ -8,16 +8,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PeleLMeX controls &mdash; PeleLMeX 22.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme.css?v=df66b05f" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=d09052ea"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -74,6 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#active-control">Active control</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-time-diagnostics">Run-time diagnostics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-time-control">Run-time control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#selection-of-helpful-gnumakefile-flags">Selection of Helpful GNUmakefile Flags</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Troubleshooting.html">Troubleshooting</a></li>
@@ -204,6 +205,7 @@ the first stopping criterion encountered will lead to termination of the simulat
 <section id="io-parameters">
 <h2>IO parameters<a class="headerlink" href="#io-parameters" title="Link to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#--------------------------IO CONTROL--------------------------</span>
+<span class="n">peleLM</span><span class="o">.</span><span class="n">base_output_prefix</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">/</span>    <span class="c1"># [OPT, DEF=&quot;&quot;] Prefix applied across all output types (plt, chk, diagnostics, temporals)</span>
 <span class="n">amr</span><span class="o">.</span><span class="n">plot_int</span>         <span class="o">=</span> <span class="mi">20</span>              <span class="c1"># [OPT, DEF=-1] Frequency (as step #) for writing plot file</span>
 <span class="n">amr</span><span class="o">.</span><span class="n">plot_overwrite</span>   <span class="o">=</span> <span class="n">false</span>           <span class="c1"># [OPT, DEF=false] Overwrite plot files with same name if present</span>
 <span class="n">amr</span><span class="o">.</span><span class="n">plot_init_state</span>  <span class="o">=</span> <span class="n">false</span>           <span class="c1"># [OPT, DEF=false] Create a plot file during initialization before the initial projections</span>
@@ -283,67 +285,71 @@ to embedded boundaries are discussed below.</p>
 <td><p>NUM_SPECIES</p></td>
 <td><p>Species mole fractions</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>diffcoeff</cite></p></td>
+<tr class="row-even"><td><p><cite>element_fractions</cite></p></td>
+<td><p>NUM_ELEMENTS</p></td>
+<td><p>Element mass fractions</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>diffcoeff</cite></p></td>
 <td><p>NUM_SPECIES</p></td>
 <td><p>Species mixture-averaged diffusion coefficients</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>lambda</cite></p></td>
+<tr class="row-even"><td><p><cite>lambda</cite></p></td>
 <td><p>1</p></td>
 <td><p>Thermal diffusivity</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>viscosity</cite></p></td>
+<tr class="row-odd"><td><p><cite>viscosity</cite></p></td>
 <td><p>1</p></td>
 <td><p>Mixture viscosity</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>mixture_fraction</cite></p></td>
+<tr class="row-even"><td><p><cite>mixture_fraction</cite></p></td>
 <td><p>1</p></td>
 <td><p>Mixture fraction based on Bilger’s element formulation</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>progress_variable</cite></p></td>
+<tr class="row-odd"><td><p><cite>progress_variable</cite></p></td>
 <td><p>1</p></td>
 <td><p>Progress variable based on a linear combination of Ys, T</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>avg_pressure</cite></p></td>
+<tr class="row-even"><td><p><cite>avg_pressure</cite></p></td>
 <td><p>1</p></td>
 <td><p>Cell-averaged pressure (from the node-centered pressure)</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>mag_vort</cite></p></td>
+<tr class="row-odd"><td><p><cite>mag_vort</cite></p></td>
 <td><p>1</p></td>
 <td><p>Vorticity magnitude</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>vorticity</cite></p></td>
+<tr class="row-even"><td><p><cite>vorticity</cite></p></td>
 <td><p>AMREX_SPACEDIM*2-3</p></td>
 <td><p>VortZ (2D) or VortX, VortY, VortZ (3D)</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>Qcrit</cite></p></td>
+<tr class="row-odd"><td><p><cite>Qcrit</cite></p></td>
 <td><p>1</p></td>
 <td><p>Q-Criterion : <span class="math notranslate nohighlight">\(0.5(|\boldsymbol{\Omega}|^2 - |\boldsymbol{S}|^2)\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>kinetic_energy</cite></p></td>
+<tr class="row-even"><td><p><cite>kinetic_energy</cite></p></td>
 <td><p>1</p></td>
 <td><p>Kinetic energy: 0.5 * rho * (u^2+v^2+w^2)</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>enstrophy</cite></p></td>
+<tr class="row-odd"><td><p><cite>enstrophy</cite></p></td>
 <td><p>1</p></td>
 <td><p>enstrophy: 0.5 * rho * (omega_x^2+omega_y^2+omega_z^2)</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>HeatRelease</cite></p></td>
+<tr class="row-even"><td><p><cite>HeatRelease</cite></p></td>
 <td><p>1</p></td>
 <td><p>Heat release rate from chem. reactions</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>rhominsumrhoY</cite></p></td>
+<tr class="row-odd"><td><p><cite>rhominsumrhoY</cite></p></td>
 <td><p>1</p></td>
 <td><p>Rho minus sum of rhoYs, for debug purposes</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>coordinates</cite></p></td>
+<tr class="row-even"><td><p><cite>coordinates</cite></p></td>
 <td><p>AMREX_SPACEDIM</p></td>
 <td><p>Cell-center coordinates</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>DistributionMap</cite></p></td>
+<tr class="row-odd"><td><p><cite>DistributionMap</cite></p></td>
 <td><p>1</p></td>
 <td><p>The MPI-rank of each box</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>derUserDefined</cite></p></td>
+<tr class="row-even"><td><p><cite>derUserDefined</cite></p></td>
 <td><p>?</p></td>
 <td><p>A user-defined derived which number of components is provided by the user (see below).</p></td>
 </tr>
@@ -358,7 +364,7 @@ user derived variables to the input file via <cite>amr.derive_plot_vars</cite>.<
 <section id="pelelmex-algorithm">
 <h2>PeleLMeX algorithm<a class="headerlink" href="#pelelmex-algorithm" title="Link to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#-----------------------PELE CONTROL-----------------------</span>
-<span class="n">peleLM</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>                           <span class="c1"># [OPT, DEF=0] Verbose</span>
+<span class="n">peleLM</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>                           <span class="c1"># [OPT, DEF=0] Verbose (1 - verbose for core algorithm, 2+ adds default verbosity for deltaTiters, projections, etc)</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">run_mode</span> <span class="o">=</span> <span class="n">normal</span>               <span class="c1"># [OPT, DEF=normal] Switch between time-advance mode (normal) or UnitTest (evaluate)</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">use_wbar</span> <span class="o">=</span> <span class="mi">1</span>                    <span class="c1"># [OPT, DEF=1] Enable Wbar correction in diffusion fluxes</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">sdc_iterMax</span> <span class="o">=</span> <span class="mi">2</span>                 <span class="c1"># [OPT, DEF=1] Number of SDC iterations</span>
@@ -562,7 +568,7 @@ may also impact the isothermal EB capability.</p>
 <span class="n">nodal_proj</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span>                    <span class="c1"># [OPT, DEF=0] Verbose of the nodal projector</span>
 <span class="n">nodal_proj</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1.0e-11</span>                 <span class="c1"># [OPT, DEF=1e-11] Relative tolerance of the nodal projection</span>
 <span class="n">nodal_proj</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="mf">1.0e-12</span>                 <span class="c1"># [OPT, DEF=1e-14] Absolute tolerance of the nodal projection</span>
-<span class="n">nodal_proj</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">=</span> <span class="mi">50</span>                   <span class="c1"># [OPT, DEF=] Maximum number of iterations of the nodal projection</span>
+<span class="n">nodal_proj</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">=</span> <span class="mi">100</span>                  <span class="c1"># [OPT, DEF=100] Maximum number of iterations of the nodal projection</span>
 <span class="n">nodal_proj</span><span class="o">.</span><span class="n">mg_max_coarsening_level</span> <span class="o">=</span> <span class="mi">5</span>    <span class="c1"># [OPT, DEF=100] Maximum number of MG levels (useful when using EB)</span>
 <span class="n">nodal_proj</span><span class="o">.</span><span class="n">bottom_verbose</span> <span class="o">=</span> <span class="mi">1</span>             <span class="c1"># [OPT, DEF=0] Verbose of the bottom solve for nodal projector</span>
 <span class="n">nodal_proj</span><span class="o">.</span><span class="n">bottom_rtol</span> <span class="o">=</span> <span class="mf">1e-3</span>             <span class="c1"># [OPT, DEF=1e-4] Relative tolerance of the bottom solve for nodal projection</span>
@@ -572,6 +578,7 @@ may also impact the isothermal EB capability.</p>
 <span class="n">mac_proj</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span>                      <span class="c1"># [OPT, DEF=0] Verbose of the MAC projector</span>
 <span class="n">mac_proj</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1.0e-11</span>                   <span class="c1"># [OPT, DEF=1e-11] Relative tolerance of the MAC projection</span>
 <span class="n">mac_proj</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="mf">1.0e-12</span>                   <span class="c1"># [OPT, DEF=1e-14] Absolute tolerance of the MAC projection</span>
+<span class="n">mac_proj</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">=</span> <span class="mi">200</span>                    <span class="c1"># [OPT, DEF=200] Maximum number of iterations of the MAC projection</span>
 <span class="n">mac_proj</span><span class="o">.</span><span class="n">mg_max_coarsening_level</span> <span class="o">=</span> <span class="mi">5</span>      <span class="c1"># [OPT, DEF=100] Maximum number of MG levels (useful when using EB)</span>
 <span class="n">mac_proj</span><span class="o">.</span><span class="n">bottom_verbose</span> <span class="o">=</span> <span class="mi">1</span>               <span class="c1"># [OPT, DEF=0] Verbose of the bottom solve for MAC projector</span>
 <span class="n">mac_proj</span><span class="o">.</span><span class="n">bottom_rtol</span> <span class="o">=</span> <span class="mf">1e-3</span>               <span class="c1"># [OPT, DEF=1e-4] Relative tolerance of the bottom solve for MAC projection</span>
@@ -581,10 +588,12 @@ may also impact the isothermal EB capability.</p>
 <span class="n">diffusion</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span>                     <span class="c1"># [OPT, DEF=0] Verbose of the scalar diffusion solve</span>
 <span class="n">diffusion</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1.0e-11</span>                  <span class="c1"># [OPT, DEF=1e-11] Relative tolerance of the scalar diffusion solve</span>
 <span class="n">diffusion</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="mf">1.0e-12</span>                  <span class="c1"># [OPT, DEF=1e-14] Absolute tolerance of the scalar diffusion solve</span>
+<span class="n">diffusion</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="mi">100</span>                  <span class="c1"># [OPT, DEF=100] Maximum number of iterations of the scalar diffusion solve</span>
 
 <span class="n">tensor_diffusion</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span>              <span class="c1"># [OPT, DEF=0] Verbose of the velocity tensor diffusion solve</span>
 <span class="n">tensor_diffusion</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1.0e-11</span>           <span class="c1"># [OPT, DEF=1e-11] Relative tolerance of the velocity tensor diffusion solve</span>
 <span class="n">tensor_diffusion</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="mf">1.0e-12</span>           <span class="c1"># [OPT, DEF=1e-14] Absolute tolerance of the velocity tensor diffusion solve</span>
+<span class="n">tensor_diffusion</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="mi">100</span>           <span class="c1"># [OPT, DEF=100] Maximum number of iterations of the velocity tensor diffusion solve</span>
 </pre></div>
 </div>
 <section id="hypre-support">
@@ -657,6 +666,7 @@ or other overall balance information to get a sense of the status and sanity of 
 to activate <cite>temporal</cite> diagnostics performing these reductions at given intervals:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#-------------------------TEMPORALS---------------------------</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">do_temporals</span> <span class="o">=</span> <span class="mi">1</span>                     <span class="c1"># [OPT, DEF=0] Activate temporal diagnostics</span>
+<span class="n">peleLM</span><span class="o">.</span><span class="n">temporal_dir</span> <span class="o">=</span> <span class="n">temporals</span>             <span class="c1"># [OPT, DEF=&quot;temporals&quot;] Directory to store temporal diagnostics</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">temporal_int</span> <span class="o">=</span> <span class="mi">10</span>                    <span class="c1"># [OPT, DEF=5] Temporal freq.</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">do_extremas</span> <span class="o">=</span> <span class="mi">1</span>                      <span class="c1"># [OPT, DEF=0] Trigger extremas, if temporals activated</span>
 <span class="n">peleLM</span><span class="o">.</span><span class="n">do_mass_balance</span> <span class="o">=</span> <span class="mi">1</span>                  <span class="c1"># [OPT, DEF=0] Compute mass balance, if temporals activated</span>
@@ -795,6 +805,58 @@ example:</p>
 <p>By default, the code checks if these files exist every 10 time steps, but the user can either increase or decrease the
 frequency using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">amr</span><span class="o">.</span><span class="n">message_int</span>      <span class="o">=</span> <span class="mi">20</span>                <span class="c1"># [OPT, DEF=10] Frequency for checking the presence of trigger files</span>
+</pre></div>
+</div>
+</section>
+<section id="selection-of-helpful-gnumakefile-flags">
+<h2>Selection of Helpful GNUmakefile Flags<a class="headerlink" href="#selection-of-helpful-gnumakefile-flags" title="Link to this heading"></a></h2>
+<p>When compiling PeleLMeX, several compilation flags can be selected to help with debugging, improving performance, etc. Below is a selection of some of the most common flags users may wish to add to their <cite>GNUmakefile</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Models</span>
+<span class="n">USE_PLASMA</span> <span class="o">=</span> <span class="n">TRUE</span>                    <span class="c1"># [OPT, DEF=FALSE] Enable plasma model</span>
+<span class="n">USE_PARTICLES</span> <span class="o">=</span> <span class="n">TRUE</span>                 <span class="c1"># [OPT, DEF=FALSE] Enable Lagrangian particle spray model</span>
+<span class="n">USE_SOOT</span> <span class="o">=</span> <span class="n">TRUE</span>                      <span class="c1"># [OPT, DEF=FALSE] Enable soot model</span>
+<span class="n">USE_RADIATION</span> <span class="o">=</span> <span class="n">TRUE</span>                 <span class="c1"># [OPT, DEF=FALSE] Enable radiation model</span>
+<span class="n">PELELM_NUM_ODE</span> <span class="o">=</span> <span class="n">INT</span>                 <span class="c1"># [OPT, DEF=0] Number of user-defined ODEs to solve</span>
+
+<span class="c1"># If USE_PARTICLES = TRUE</span>
+<span class="n">SPRAY_FUEL_NUM</span> <span class="o">=</span> <span class="n">INT</span>                 <span class="c1"># [REQD] Number of fuel species in spray model</span>
+<span class="n">SPRAY_GCM</span> <span class="o">=</span> <span class="n">TRUE</span>                     <span class="c1"># [OPT, DEF=FALSE] Enable group contribution method for liquid property prediction in spray model</span>
+
+<span class="c1"># If USE_SOOT = TRUE</span>
+<span class="n">NUM_SOOT_MOMENTS</span> <span class="o">=</span> <span class="mi">3</span>                 <span class="c1"># [REQD] Number of soot moments (must be 3 or 6)</span>
+
+<span class="c1"># Equation of State</span>
+<span class="n">Eos_Model</span> <span class="o">=</span> <span class="n">Fuego</span>                    <span class="c1"># [OPT, DEF=Fuego] EOS model: GammaLaw, Fuego, Soave-Redlich-Kwong, Manifold, or Null</span>
+
+<span class="c1"># If Eos_Model = Manifold</span>
+<span class="n">Manifold_Dim</span> <span class="o">=</span> <span class="n">INT</span>                   <span class="c1"># [REQD] Manifold dimension</span>
+<span class="n">Manifold_Type</span> <span class="o">=</span> <span class="n">Table</span>                <span class="c1"># [REQD] Manifold type: Table or Network (if unspecified, will support both but at a performance cost)</span>
+
+<span class="c1"># Transport Model</span>
+<span class="n">Transport_Model</span> <span class="o">=</span> <span class="n">Simple</span>             <span class="c1"># [OPT, DEF=Simple] Transport model: Simple, EGLib, Constant, Sutherland, or Manifold</span>
+
+<span class="c1"># Chemistry</span>
+<span class="n">Chemistry_Model</span> <span class="o">=</span> <span class="n">drm19</span>              <span class="c1"># [REQD] Chemistry mechanism name (from PelePhysics/Mechanisms) or path if USE_CUSTOM_CHEMISTRY=TRUE</span>
+<span class="n">USE_CUSTOM_CHEMISTRY</span> <span class="o">=</span> <span class="n">TRUE</span>          <span class="c1"># [OPT, DEF=FALSE] Chemistry_Model is interpreted as a path to an arbitrary location</span>
+
+<span class="c1"># Embedded Boundaries</span>
+<span class="n">USE_EB</span> <span class="o">=</span> <span class="n">TRUE</span>                        <span class="c1"># [OPT, DEF=FALSE] Enable embedded boundary support</span>
+
+<span class="c1"># HPC System Specifics and GPU/Accelerator Support</span>
+<span class="n">COMP</span> <span class="o">=</span> <span class="n">gnu</span>                           <span class="c1"># [OPT, DEF=gnu] Compiler choice: gnu, intel, cray, etc.</span>
+<span class="n">USE_MPI</span> <span class="o">=</span> <span class="n">TRUE</span>                       <span class="c1"># [OPT, DEF=TRUE] Compile with MPI support</span>
+<span class="n">USE_OMP</span> <span class="o">=</span> <span class="n">TRUE</span>                       <span class="c1"># [OPT, DEF=FALSE] Compile with OpenMP support</span>
+<span class="n">USE_CUDA</span> <span class="o">=</span> <span class="n">TRUE</span>                      <span class="c1"># [OPT, DEF=FALSE] Compile for NVIDIA GPUs</span>
+<span class="n">USE_HIP</span> <span class="o">=</span> <span class="n">TRUE</span>                       <span class="c1"># [OPT, DEF=FALSE] Compile for AMD GPUs</span>
+<span class="n">USE_SYCL</span> <span class="o">=</span> <span class="n">TRUE</span>                      <span class="c1"># [OPT, DEF=FALSE] Compile for Intel GPUs</span>
+
+<span class="c1"># Case Specific files</span>
+<span class="n">CEXE_sources</span> <span class="o">+=</span> <span class="o">&lt;</span><span class="n">file_name</span><span class="o">&gt;</span>          <span class="c1"># [OPT] Add additional source files to the build</span>
+
+<span class="c1"># Other Quality of Life Flags</span>
+<span class="n">USERSuffix</span> <span class="o">=</span> <span class="n">String</span>                  <span class="c1"># [OPT, DEF=&quot;&quot;] Suffix to append to executable name, useful when multiple builds are needed</span>
+<span class="n">TINY_PROFILE</span> <span class="o">=</span> <span class="n">TRUE</span>                  <span class="c1"># [OPT, DEF=FALSE] Enable lightweight profiling with AMReX&#39;s TinyProfiler</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="n">TRUE</span>                         <span class="c1"># [OPT, DEF=FALSE] Compile with debug flags (disables optimizations)</span>
 </pre></div>
 </div>
 </section>

@@ -8,16 +8,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>A simple triple flame &mdash; PeleLMeX 22.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme.css?v=df66b05f" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=d09052ea"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -345,7 +345,9 @@ the relevant files, for example:</p>
 <div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Chemistry_Model = drm19
 </pre></div>
 </div>
-<p>Here, the methane kinetic model <code class="docutils literal notranslate"><span class="pre">drm19</span></code>, containing 21 species is employed. The user is referred to
+<p>Here, the methane kinetic model <code class="docutils literal notranslate"><span class="pre">drm19</span></code>, containing 21 species is employed. Advanced users may also specify
+<code class="docutils literal notranslate"><span class="pre">USE_CUSTOM_CHEMISTRY</span> <span class="pre">=</span> <span class="pre">TRUE</span></code>, in which case <code class="docutils literal notranslate"><span class="pre">Chemistry_Model</span></code> is interpreted as a path and can point to models not included in
+PelePhysics by default, though the new model directory must contain valid chemistry model files. The user is referred to
 the <a class="reference external" href="https://pelephysics.readthedocs.io/en/latest/">PelePhysics</a> documentation for a list of available
 mechanisms and more information regarding the EOS, chemistry and transport models specified:</p>
 <div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Eos_Model       := Fuego

@@ -8,15 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Troubleshooting &mdash; PeleLMeX 22.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme.css?v=df66b05f" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=d09052ea"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -107,13 +107,20 @@ problem, the code will abort with the following message:</p>
 <span class="pre">`</span></code></p>
 <p>appearing multiple times when using more than one MPI rank. The first thing to do
 is to identify which linear solve is failing and how. To do so, one needs to increase
-PeleLMeX, as well as the projection solves verbose (see the <a class="reference external" href="https://amrex-combustion.github.io/PeleLMeX/LMeXControls.html">Control</a>
+PeleLMeX, as well as the projection and diffusion solve’s verbosity (see the <a class="reference external" href="https://amrex-combustion.github.io/PeleLMeX/LMeXControls.html">Control</a>
 section for more details on LMeX controls):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">peleLM</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">nodal_proj</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">mac_proj</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">peleLM</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">4</span>
 </pre></div>
 </div>
+<p>which will increase the default verbosity for all linear solvers to 2 (more generally to peleLM.v - 2),
+although the solver verbosity may also be controlled for the solvers individually:</p>
+<dl class="simple">
+<dt>::</dt><dd><p>nodal_proj.verbose = 2
+mac_proj.verbose = 2
+diffusion.verbose = 2
+tensor_diffusion.verbose = 2</p>
+</dd>
+</dl>
 <p>Note that we focused on the projection solves here because they are generally more
 prone to failure than the diffusion ones. You can then restart the simulation
 again and identify if the code is failing in the nodal projection, either during the
@@ -162,17 +169,86 @@ tolerance of the faulty solver using one of:</p>
 than this ballpark value, it probably indicates that something is wrong in the problem
 setup and one should take a closer look at the solution to understand the problem.
 Alternatively, the solver can fail as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MLMG</span><span class="p">:</span> <span class="c1"># of AMR levels: 2</span>
-  <span class="c1"># of MG levels on the coarsest AMR level: 6</span>
-<span class="n">MLMG</span><span class="p">:</span> <span class="n">Initial</span> <span class="n">rhs</span>               <span class="o">=</span> <span class="mf">395786.0963</span>
-<span class="n">MLMG</span><span class="p">:</span> <span class="n">Initial</span> <span class="n">residual</span> <span class="p">(</span><span class="n">resid0</span><span class="p">)</span> <span class="o">=</span> <span class="mf">395786.0963</span>
-<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">1</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">0.009458721163</span>
-<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">2</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mi">1046166408</span>
-<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">3</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">5.420966957e+23</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Nodal</span> <span class="n">Projection</span><span class="p">:</span>
+<span class="o">&gt;&gt;</span> <span class="n">Before</span> <span class="n">projection</span><span class="p">:</span>
+<span class="o">*</span> <span class="n">On</span> <span class="n">lev</span> <span class="mi">0</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span> <span class="o">=</span> <span class="mf">32972.4697</span>
+
+<span class="n">MLMG</span><span class="p">:</span> <span class="c1"># of AMR levels: 1</span>
+    <span class="c1"># of MG levels on the coarsest AMR level: 5</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Initial</span> <span class="n">rhs</span>               <span class="o">=</span> <span class="mf">29416.37315</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Initial</span> <span class="n">residual</span> <span class="p">(</span><span class="n">resid0</span><span class="p">)</span> <span class="o">=</span> <span class="mf">29416.37315</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">1</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">0.003754141785</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">2</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">0.104435142</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">3</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">2.918558728</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">4</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">81.56015694</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">5</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">2279.227794</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">6</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">63693.83698</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">7</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">1779947.086</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">8</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">49741258.78</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>   <span class="mi">9</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mi">1390037291</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">10</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">3.884508992e+10</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">11</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">1.08553995e+12</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">12</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">3.033580267e+13</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">13</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">8.477448701e+14</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">14</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">2.369053401e+16</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">15</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">6.620404574e+17</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">16</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">1.850095768e+19</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Iteration</span>  <span class="mi">17</span> <span class="n">Fine</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">5.170158884e+20</span>
+<span class="n">MLMG</span><span class="p">:</span> <span class="n">Failing</span> <span class="n">to</span> <span class="n">converge</span> <span class="n">after</span> <span class="mi">17</span> <span class="n">iterations</span><span class="o">.</span> <span class="n">resid</span><span class="p">,</span> <span class="n">resid</span><span class="o">/</span><span class="n">bnorm</span> <span class="o">=</span> <span class="mf">1.52087323e+25</span><span class="p">,</span> <span class="mf">5.170158884e+20</span>
 </pre></div>
 </div>
 <p>In this case, the solver diverges and it is generally a clear indication that the problem
-is not properly setup.</p>
+is not properly setup. To aid in debugging, it may be useful to dump plotfiles of the residual
+and solution at the time of the failure to visually inspect where the solution is diverging.
+This can be accomplished by enabling residual plotting on MLMG failure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">peleLM</span><span class="o">.</span><span class="n">mlmg_fail_plt_residuals</span> <span class="o">=</span> <span class="n">true</span>       <span class="c1"># [OPT, DEF=false] Dump MLMG residuals plotfiles on MLMG failure</span>
+</pre></div>
+</div>
+<p>In the example above, plotfiles named <code class="docutils literal notranslate"><span class="pre">&lt;plot_dir&gt;/pltMLMGResidual_&lt;solver&gt;_&lt;step&gt;_&lt;iters&gt;</span></code>
+would be created after the failure in the 17th iteration of the nodal projection at the given time step.
+However, given that <code class="docutils literal notranslate"><span class="pre">resid/bnorm</span> <span class="pre">=</span> <span class="pre">5.170158884e+20</span></code> here, it is likely that the
+residual is large everywhere in the domain. Therefore, it may be more useful to dump the residuals
+after a smaller number of iterations, e.g., iteration 3 or 4 where the residual is still relatively small,
+but clearly growing. Since the nodal projection is always the last MLMG solve for a given time step,
+this can be accomplihed by setting <cite>nodal_proj.maxiter=4</cite>. This results in the following output upon failure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>MLMG: # of AMR levels: 1
+    # of MG levels on the coarsest AMR level: 5
+MLMG: Initial rhs               = 29416.37318
+MLMG: Initial residual (resid0) = 29416.37318
+MLMG: Iteration   1 Fine resid/bnorm = 0.003754106743
+MLMG: Iteration   2 Fine resid/bnorm = 0.1044336961
+MLMG: Iteration   3 Fine resid/bnorm = 2.918500162
+MLMG: Iteration   4 Fine resid/bnorm = 81.55801241
+MLMG: Failed to converge after 4 iterations. resid, resid/bnorm = 2399140.929, 81.55801241
+
+*** Nodal projection MLMG solve failed! ***
+Error: MLMG failed to converge.
+Dumping residuals for debugging...
+</pre></div>
+</div>
+<p>For the other solvers (MAC projection, species/temperature diffusion, and tensor diffusion),
+users can further control when to dump the residuals for debugging based on
+a minimum number of SDC and, when appropriate, deltaT iterations.  This is done
+on a per-solver basis using the following options:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># MAC projection controls</span>
+<span class="n">mac_proj</span><span class="o">.</span><span class="n">mlmg_fail_sdc_miniter</span> <span class="o">=</span> <span class="mi">2</span>                             <span class="c1"># [OPT, DEF=-1] Minimum SDC iterations before dumping residuals on MLMG failure</span>
+<span class="n">mac_proj</span><span class="o">.</span><span class="n">mlmg_fail_maxiter_after_sdc_miniter</span> <span class="o">=</span> <span class="mi">3</span>               <span class="c1"># [OPT, DEF=-1] Maximum MLMG solver iters after minimum SDC iters have been reached</span>
+
+<span class="c1"># Species/Temperature diffusion controls</span>
+<span class="n">diffusion</span><span class="o">.</span><span class="n">mlmg_fail_sdc_miniter</span> <span class="o">=</span> <span class="mi">1</span>                            <span class="c1"># [OPT, DEF=-1] Minimum SDC iterations before dumping residuals on MLMG failure</span>
+<span class="n">diffusion</span><span class="o">.</span><span class="n">mlmg_fail_deltaT_miniter</span> <span class="o">=</span> <span class="mi">4</span>                         <span class="c1"># [OPT, DEF=-1] Minimum deltaT iterations before dumping residuals on MLMG failure (only for temperature diffusion)</span>
+<span class="n">diffusion</span><span class="o">.</span><span class="n">mlmg_fail_species_maxiter_after_sdc_miniter</span> <span class="o">=</span> <span class="mi">5</span>      <span class="c1"># [OPT, DEF=-1] Maximum species MLMG solver iters after minimum SDC iters have been reached</span>
+<span class="n">diffusion</span><span class="o">.</span><span class="n">mlmg_fail_temp_maxiter_after_sdc_deltaT_miniter</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># [OPT, DEF=-1] Maximum temp MLMG solver iters after minimum SDC and deltaT iters have been reached</span>
+
+<span class="c1"># Velocity diffusion controls</span>
+<span class="n">tensor_diffusion</span><span class="o">.</span><span class="n">mlmg_fail_sdc_miniter</span> <span class="o">=</span> <span class="mi">1</span>                     <span class="c1"># [OPT, DEF=-1] Minimum SDC iterations before dumping residuals on MLMG failure</span>
+<span class="n">tensor_diffusion</span><span class="o">.</span><span class="n">mlmg_maxiter_after_sdc_miniter</span> <span class="o">=</span> <span class="mi">6</span>            <span class="c1"># [OPT, DEF=-1] Maximum MLMG solver iters after minimum SDC iters have been reached</span>
+</pre></div>
+</div>
+<p>As an example, setting <code class="docutils literal notranslate"><span class="pre">diffusion.mlmg_fail_sdc_miniter</span> <span class="pre">=</span> <span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">diffusion.mlmg_fail_deltaT_miniter</span> <span class="pre">=</span> <span class="pre">2</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">diffusion.mlmg_fail_temp_maxiter_after_sdc_deltaT_miniter</span> <span class="pre">=</span> <span class="pre">3</span></code> would result in dumping the temperature diffusion
+residuals for debugging only if the failure occurs after at least 2 SDC iterations and 2 deltaT iterations, and
+the MLMG solver has performed at least 3 iterations after those minimums have been reached.</p>
 </section>
 <section id="chemistry-integration-failure">
 <h2>Chemistry integration failure<a class="headerlink" href="#chemistry-integration-failure" title="Link to this heading"></a></h2>
